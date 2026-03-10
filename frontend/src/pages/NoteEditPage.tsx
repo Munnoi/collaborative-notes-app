@@ -9,6 +9,7 @@ export default function NoteEditPage() {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const { remoteNote, sendEdit } = useNoteSocket(id);
 
@@ -16,6 +17,7 @@ export default function NoteEditPage() {
     api.get(`/notes/${id}`).then((res) => {
       setTitle(res.data.title);
       setContent(res.data.content);
+      setIsPublic(res.data.isPublic ?? false);
       setLoaded(true);
     });
   }, [id]);
@@ -38,7 +40,7 @@ export default function NoteEditPage() {
   };
 
   const handleSave = async (data: { title: string; content: string }) => {
-    await api.patch(`/notes/${id}`, data);
+    await api.patch(`/notes/${id}`, { ...data, isPublic });
     navigate('/notes');
   };
 
@@ -53,6 +55,26 @@ export default function NoteEditPage() {
         </button>
       </header>
       <main className="max-w-2xl mx-auto p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+              className="rounded border-gray-300"
+            />
+            Public
+          </label>
+          {isPublic && (
+            <button
+              type="button"
+              onClick={() => navigator.clipboard.writeText(`${window.location.origin}/public/${id}`)}
+              className="text-xs text-blue-600 hover:text-blue-800 underline"
+            >
+              Copy public link
+            </button>
+          )}
+        </div>
         <NoteForm
           title={title}
           content={content}

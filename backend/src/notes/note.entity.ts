@@ -20,6 +20,9 @@ export class Note {
   @Column({ type: 'text' })
   content: string;
 
+  @Column({ default: false })
+  isPublic: boolean;
+
   @ManyToOne(() => User, (user) => user.notes)
   owner: User;
 
