@@ -11,9 +11,9 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { NotesService } from './notes.service';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: '*' } }) // Creates a websocket server.
 export class NotesGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer()
+  @WebSocketServer() // This gives access to the Socket.IO server instance.
   server: Server;
 
   constructor(
@@ -23,14 +23,14 @@ export class NotesGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     try {
-      const token = client.handshake.auth.token;
+      const token = client.handshake.auth.token; // The client sends the token during connection.
       this.jwtService.verify(token);
     } catch {
-      client.disconnect();
+      client.disconnect(); // If token is invalid.
     }
   }
 
-  handleDisconnect() {}
+  handleDisconnect() {} // Runs when client disconnects.
 
   @SubscribeMessage('joinNote')
   handleJoinNote(
